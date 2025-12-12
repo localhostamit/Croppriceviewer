@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haryana Mandi Bhav (Official)</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --light: #e8f5e9;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Header */
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--light); padding-bottom: 15px; }
+        h1 { color: var(--primary); margin: 0; font-size: 24px; }
+        p.subtitle { color: #666; margin: 5px 0 0 0; font-size: 14px; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; color: #333; margin-bottom: 8px; }
+        select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; background: white; }
+        
+        button { 
+            width: 100%; padding: 14px; background: var(--primary); color: white; 
+            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; 
+            transition: background 0.3s;
+        }
+        button:hover { background: #1b5e20; }
+
+        /* Results Area */
+        #status-msg { text-align: center; margin: 15px 0; font-style: italic; color: #666; font-size: 14px; }
+        .price-card { 
+            background: white; border: 1px solid #eee; border-left: 5px solid var(--primary); 
+            padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .crop-info h3 { margin: 0 0 5px 0; color: #333; }
+        .crop-info p { margin: 0; color: #666; font-size: 14px; }
+        .price-tag { text-align: right; }
+        .price-val { font-size: 20px; font-weight: bold; color: var(--primary); display: block; }
+        .unit { font-size: 12px; color: #888; }
+
+        /* Badge for Demo Mode */
+        .demo-badge { background: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 4px; font-size: 12px; text-align: center; display: none; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="demo-alert" class="demo-badge">⚠️ Server Busy: Showing Offline Demo Data</div>
+    
+    <header>
+        <h1>🚜 Haryana Mandi Bhav</h1>
+        <p class="subtitle">Live Market Prices / ताजा मंडी भाव</p>
+    </header>
+
+    <div class="form-group">
+        <label>Select District / जिला चुनें:</label>
+        <select id="district">
+            <option value="Karnal">Karnal (करनाल)</option>
+            <option value="Kurukshetra">Kurukshetra (कुरुक्षेत्र)</option>
+            <option value="Ambala">Ambala (अंबाला)</option>
+            <option value="Panipat">Panipat (पानीपत)</option>
+            <option value="Hisar">Hisar (हिसार)</option>
+            <option value="Sonipat">Sonipat (सोनीपत)</option>
+            <option value="Sirsa">Sirsa (सिरसा)</option>
+        </select>
+    </div>
+
+    <button onclick="getPrices()">Check Price (भाव देखें)</button>
+    <div id="status-msg"></div>
+    <div id="results"></div>
+</div>
+
+<script>
+    // 1. Hindi Translation Dictionary
+    const dictionary = {
+        "Wheat": "गेहूं",
+        "Rice": "चावल",
+        "Paddy(Dhan)": "धान (Basmati)",
+        "Potato": "आलू",
+        "Onion": "प्याज",
+        "Tomato": "टमाटर",
+        "Mustard": "सरसों",
+        "Cotton": "कपास",
+        "Sugarcane": "गन्ना",
+        "Common": "सामान्य"
+    };
+
+    function translate(text) {
+        if (!text) return "";
+        // Check if word exists in dictionary, else return original English word
+        return dictionary[text] || text;
+    }
+
+    // 2. MOCK DATA (Fallback if API fails)
+    const mockData = {
+        "Karnal": [
+            { commodity: "Wheat", market: "Karnal", modal_price: "2275", arrival_date: "12/12/2025" },
+            { commodity: "Paddy(Dhan)", market: "Gharaunda", modal_price: "3850", arrival_date: "12/12/2025" },
+            { commodity: "Potato", market: "Karnal", modal_price: "850", arrival_date: "12/12/2025" }
+        ],
+        "Kurukshetra": [
+            { commodity: "Rice", market: "Thanesar", modal_price: "4100", arrival_date: "12/12/2025" },
+            { commodity: "Mustard", market: "Pipli", modal_price: "5400", arrival_date: "12/12/2025" }
+        ],
+        "Hisar": [
+            { commodity: "Cotton", market: "Hansi", modal_price: "6800", arrival_date: "12/12/2025" },
+            { commodity: "Wheat", market: "Hisar", modal_price: "2300", arrival_date: "12/12/2025" }
+        ]
+    };
+
+    async function getPrices() {
+        const district = document.getElementById('district').value;
+        const resultsDiv = document.getElementById('results');
+        const statusMsg = document.getElementById('status-msg');
+        const demoAlert = document.getElementById('demo-alert');
+
+        // Reset UI
+        resultsDiv.innerHTML = '';
+        demoAlert.style.display = 'none';
+        statusMsg.innerText = 'Connecting to Government Server...';
+        
+        // Use a publicly known test key (often hits limits)
+        const apiKey = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b";
+        const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
+
+        try {
+            // Attempt to fetch real data
+            const response = await fetch(url);
+            
+            if (!response.ok) { throw new Error("API Limit or Server Error"); }
+            
+            const data = await response.json();
+            
+            // Check if records exist
+            if (data.records && data.records.length > 0) {
+                statusMsg.innerText = `Found ${data.records.length} updates for ${district}`;
+                renderData(data.records);
+            } else {
+                throw new Error("No data found");
+            }
+
+        } catch (error) {
+            // FALLBACK TO MOCK DATA
+            console.warn("API Failed, switching to Mock Data", error);
+            demoAlert.style.display = 'block';
+            statusMsg.innerText = 'Showing offline estimates (Server Busy)';
+            
+            // Get mock data for selected district or default to empty
+            const fakeData = mockData[district] || [
+                { commodity: "Wheat", market: district + " Mandi", modal_price: "2200", arrival_date: "12/12/2025" },
+                { commodity: "Rice", market: district + " Mandi", modal_price: "3500", arrival_date: "12/12/2025" }
+            ];
+            renderData(fakeData);
+        }
+    }
+
+    function renderData(records) {
+        const resultsDiv = document.getElementById('results');
+        
+        records.forEach(item => {
+            // Translate names
+            const hindiName = translate(item.commodity);
+            
+            const card = document.createElement('div');
+            card.className = 'price-card';
+            card.innerHTML = `
+                <div class="crop-info">
+                    <h3>${hindiName} <small style="color:#888; font-size:14px">(${item.commodity})</small></h3>
+                    <p>📍 ${item.market}</p>
+                    <p>📅 ${item.arrival_date}</p>
+                </div>
+                <div class="price-tag">
+                    <span class="price-val">₹${item.modal_price}</span>
+                    <span class="unit">per Quintal</span>
+                </div>
+            `;
+            resultsDiv.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
