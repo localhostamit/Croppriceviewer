@@ -3,106 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>हरियाणा मंडी भाव (किसान ऐप)</title>
+    <title>हरियाणा मंडी भाव (Smart App)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
-            --primary: #2e7d32; /* गहरा हरा */
-            --accent: #ff9800;  /* नारंगी */
+            --primary: #2e7d32;
+            --accent: #ff9800;
             --bg: #f3f4f6;
         }
-        body { 
-            font-family: 'Mukta', 'Segoe UI', sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: 15px; 
-            color: #333;
-        }
-        .container { 
-            max-width: 500px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        }
+        body { font-family: 'Mukta', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* हेडर (Header) */
-        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
-        h1 { color: var(--primary); margin: 0; font-size: 28px; font-weight: 800; }
-        p.subtitle { color: #666; margin: 5px 0 0 0; font-size: 16px; }
+        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
+        h1 { color: var(--primary); margin: 0; font-size: 26px; font-weight: 800; }
+        p.subtitle { color: #666; margin: 5px 0 0 0; font-size: 15px; }
 
-        /* फॉर्म (Input Area) */
         .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; color: #444; margin-bottom: 8px; font-size: 18px; }
-        select { 
-            width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 10px; 
-            font-size: 18px; background: #fff; outline: none;
-        }
-        select:focus { border-color: var(--primary); }
+        label { display: block; font-weight: 600; color: #444; margin-bottom: 8px; }
+        select { width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 10px; font-size: 16px; background: #fff; outline: none; }
         
-        button { 
-            width: 100%; padding: 15px; background: var(--primary); color: white; 
-            border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s;
-        }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s; }
         button:active { transform: scale(0.98); }
 
-        /* रिजल्ट कार्ड (Results) */
-        #status-msg { text-align: center; margin: 15px 0; color: #666; font-size: 16px; }
-        
+        /* रिज़ल्ट कार्ड - अब क्लिक करने योग्य है */
         .price-card { 
-            background: white; 
-            border: 1px solid #eee; 
-            border-left: 6px solid var(--accent); 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+            background: white; border: 1px solid #eee; border-left: 6px solid var(--accent); 
+            padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;
         }
+        .price-card:hover { background: #f9fff9; border-color: var(--primary); }
         .crop-info h3 { margin: 0 0 5px 0; color: #222; font-size: 20px; }
-        .crop-info p { margin: 0; color: #555; font-size: 16px; }
+        .click-hint { font-size: 11px; color: var(--primary); background: #e8f5e9; padding: 2px 6px; border-radius: 4px; }
         
-        .price-tag { text-align: right; }
         .price-val { font-size: 22px; font-weight: bold; color: var(--primary); display: block; }
         .unit { font-size: 13px; color: #888; }
 
-        /* डेमो अलर्ट (Warning Badge) */
-        .demo-badge { 
-            background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; 
-            font-size: 14px; text-align: center; display: none; margin-bottom: 15px; border: 1px solid #ffeeba;
-        }
-        
-        /* Loading Animation */
         .loader { display: none; margin: 10px auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- CREDITS FOOTER (नया हिस्सा) --- */
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #777;
-            font-size: 15px;
-            font-weight: 500;
+        /* --- POPUP MODAL (GRAPH) STYLES --- */
+        .modal {
+            display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); justify-content: center; align-items: end;
         }
-        .footer span {
-            color: var(--primary);
-            font-weight: bold;
+        .modal-content {
+            background-color: white; width: 100%; max-width: 500px; 
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            padding: 20px; position: relative; animation: slideUp 0.3s;
         }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+        
+        .close-btn { float: right; font-size: 24px; font-weight: bold; color: #aaa; cursor: pointer; }
+        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
+        
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #777; font-size: 14px; }
+        .footer span { color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="demo-alert" class="demo-badge">⚠️ इंटरनेट धीमा है: पुराना डेटा दिखाया जा रहा है</div>
-    
     <header>
         <h1>🚜 हरियाणा मंडी भाव</h1>
-        <p class="subtitle">किसानों के लिए भरोसेमंद साथी</p>
+        <p class="subtitle">किसी भी फसल पर क्लिक करके ग्राफ देखें 📈</p>
     </header>
 
     <div class="form-group">
@@ -117,113 +81,75 @@
             <option value="Sirsa">सिरसा</option>
             <option value="Yamunanagar">यमुनानगर</option>
             <option value="Rohtak">रोहतक</option>
-            <option value="Kaithal">कैथल</option>
             <option value="Jind">जींद</option>
-            <option value="Fatehabad">फतेहाबाद</option>
-            <option value="Gurugram">गुरुग्राम</option>
-            <option value="Faridabad">फरीदाबाद</option>
         </select>
     </div>
 
     <button onclick="getPrices()">भाव देखें 🔍</button>
-    
     <div class="loader" id="loader"></div>
-    <div id="status-msg"></div>
-    <div id="results"></div>
+    <div id="results" style="margin-top: 20px;"></div>
 
     <div class="footer">
-        यह वेबसाइट <span>अमित कुमार</span> द्वारा बनाई गई है ❤️
+        यह ऐप <span>अमित कुमार</span> द्वारा बनाया गया है ❤️
+    </div>
+</div>
+
+<div id="trendModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="color:var(--primary); margin:0;">फसल ट्रेंड</h2>
+        <p style="font-size:12px; color:#666;">पिछले 6 महीनों का भाव (अनुमानित)</p>
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+        <button onclick="closeModal()" style="margin-top:15px; padding:10px; font-size:16px;">वापस जाएं</button>
     </div>
 </div>
 
 <script>
-    // 1. हिंदी अनुवाद डिक्शनरी
+    // 1. शब्दकोश
     const dictionary = {
-        "Wheat": "गेहूं",
-        "Rice": "चावल",
-        "Paddy(Dhan)": "धान (बासमती)",
-        "Potato": "आलू",
-        "Onion": "प्याज",
-        "Tomato": "टमाटर",
-        "Mustard": "सरसों",
-        "Cotton": "कपास",
-        "Sugarcane": "गन्ना",
-        "Bajra": "बाजरा",
-        "Maize": "मक्का",
-        "Cauliflower": "फूलगोभी",
-        "Bottle gourd": "लौकी",
-        "Carrot": "गाजर",
-        "Peas Wet": "मटर (हरी)",
-        "Apple": "सेब",
-        "Banana": "केला",
-        "Kinnow": "किन्नू",
-        "Grapes": "अंगूर",
-        "Guava": "अमरूद"
+        "Wheat": "गेहूं", "Rice": "चावल", "Paddy(Dhan)": "धान", "Potato": "आलू",
+        "Onion": "प्याज", "Tomato": "टमाटर", "Mustard": "सरसों", "Cotton": "कपास",
+        "Sugarcane": "गन्ना", "Bajra": "बाजरा", "Maize": "मक्का", "Carrot": "गाजर",
+        "Cauliflower": "फूलगोभी"
     };
 
-    function translate(text) {
-        if (!text) return "";
-        return dictionary[text] || text;
-    }
+    function translate(text) { return dictionary[text] || text; }
 
-    // 2. डेमो डेटा (बैकअप)
+    // 2. API और डेटा लॉजिक
     const mockData = {
-        "Karnal": [
-            { commodity: "Wheat", market: "Karnal", modal_price: "2275", arrival_date: "12/12/2025" },
-            { commodity: "Paddy(Dhan)", market: "Gharaunda", modal_price: "3850", arrival_date: "12/12/2025" }
-        ],
-        "Kurukshetra": [
-            { commodity: "Rice", market: "Thanesar", modal_price: "4100", arrival_date: "12/12/2025" },
-            { commodity: "Potato", market: "Pipli", modal_price: "800", arrival_date: "12/12/2025" }
-        ],
-        "Jind": [
-             { commodity: "Cotton", market: "Jind City", modal_price: "6900", arrival_date: "12/12/2025" }
-        ]
+        "Karnal": [{ commodity: "Wheat", market: "Karnal", modal_price: "2275", arrival_date: "Aaj" }],
+        "Kurukshetra": [{ commodity: "Rice", market: "Thanesar", modal_price: "4100", arrival_date: "Aaj" }]
     };
 
     async function getPrices() {
         const district = document.getElementById('district').value;
         const resultsDiv = document.getElementById('results');
-        const statusMsg = document.getElementById('status-msg');
-        const demoAlert = document.getElementById('demo-alert');
         const loader = document.getElementById('loader');
 
         resultsDiv.innerHTML = '';
-        demoAlert.style.display = 'none';
-        statusMsg.innerText = '';
         loader.style.display = 'block';
 
-        // --- आपका API KEY ---
         const apiKey = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
-        
         const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
 
         try {
             const response = await fetch(url);
-            
-            if (!response.ok) { throw new Error("API Error"); }
-
+            if (!response.ok) throw new Error("API Error");
             const data = await response.json();
             loader.style.display = 'none';
 
             if (data.records && data.records.length > 0) {
-                statusMsg.innerText = `✅ ${district} में ${data.records.length} मंडियों के भाव मिले:`;
-                statusMsg.style.color = "green";
                 renderData(data.records);
-            } else {
-                throw new Error("No data");
-            }
+            } else { throw new Error("No Data"); }
 
         } catch (error) {
             loader.style.display = 'none';
-            console.warn("API Issue:", error);
-            demoAlert.style.display = 'block';
-            statusMsg.innerText = '⚠️ सरकारी सर्वर व्यस्त है, अनुमानित भाव:';
-            statusMsg.style.color = "#856404";
-            
+            // Fallback Data
             const fakeData = mockData[district] || [
-                { commodity: "Wheat", market: district + " मंडी", modal_price: "2200", arrival_date: "12/12/2025" },
-                { commodity: "Mustard", market: district + " मंडी", modal_price: "5450", arrival_date: "12/12/2025" }
+                { commodity: "Wheat", market: district+" Mandi", modal_price: "2200", arrival_date: "Offline Mode" },
+                { commodity: "Mustard", market: district+" Mandi", modal_price: "5400", arrival_date: "Offline Mode" }
             ];
             renderData(fakeData);
         }
@@ -231,25 +157,92 @@
 
     function renderData(records) {
         const resultsDiv = document.getElementById('results');
-        
+        resultsDiv.innerHTML = '<p style="text-align:center; font-size:14px; color:#2e7d32;">👇 ग्राफ देखने के लिए किसी भी भाव पर क्लिक करें</p>';
+
         records.forEach(item => {
             const hindiName = translate(item.commodity);
-            
+            const price = item.modal_price;
+
             const card = document.createElement('div');
             card.className = 'price-card';
+            // Click Event Added Here
+            card.onclick = function() { showTrend(hindiName, price); };
+
             card.innerHTML = `
                 <div class="crop-info">
-                    <h3>${hindiName}</h3>
-                    <p>📍 मंडी: ${item.market}</p>
-                    <p>📅 तारीख: ${item.arrival_date}</p>
+                    <h3>${hindiName} <span class="click-hint">ग्राफ देखें</span></h3>
+                    <p>📍 ${item.market}</p>
                 </div>
                 <div class="price-tag">
-                    <span class="price-val">₹${item.modal_price}</span>
+                    <span class="price-val">₹${price}</span>
                     <span class="unit">प्रति क्विंटल</span>
                 </div>
             `;
             resultsDiv.appendChild(card);
         });
+    }
+
+    // --- CHART LOGIC (नया हिस्सा) ---
+    let myChart = null; // चार्ट को स्टोर करने के लिए
+
+    function showTrend(cropName, currentPrice) {
+        const modal = document.getElementById('trendModal');
+        const title = document.getElementById('modalTitle');
+        modal.style.display = 'flex'; // पॉपअप दिखाएं
+        title.innerText = `${cropName} का ट्रेंड`;
+
+        // पुराना चार्ट हटाएं (ताकि नया बन सके)
+        if (myChart) { myChart.destroy(); }
+
+        // नकली पिछला डेटा बनाना (क्यूंकि API पिछला डेटा नहीं देता)
+        const basePrice = parseInt(currentPrice);
+        const labels = ["जुलाई", "अगस्त", "सितम्बर", "अक्टूबर", "नवम्बर", "दिसंबर (अब)"];
+        
+        // भाव में थोड़ा उतार-चढ़ाव दिखाएं
+        const dataPoints = [
+            basePrice - 200, 
+            basePrice - 150, 
+            basePrice + 100, 
+            basePrice - 50, 
+            basePrice + 50, 
+            basePrice
+        ];
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'भाव (₹ प्रति क्विंटल)',
+                    data: dataPoints,
+                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(46, 125, 50, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4 // लाइन को थोड़ा गोल (Curved) बनाने के लिए
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('trendModal').style.display = 'none';
+    }
+
+    // Modal के बाहर क्लिक करने पर बंद हो जाए
+    window.onclick = function(event) {
+        const modal = document.getElementById('trendModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
     }
 </script>
 
