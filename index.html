@@ -1,88 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haryana Mandi Bhav (Official)</title>
+    <title>हरियाणा मंडी भाव (किसान ऐप)</title>
     <style>
         :root {
-            --primary: #2e7d32;
-            --light: #e8f5e9;
+            --primary: #2e7d32; /* गहरा हरा */
+            --accent: #ff9800;  /* नारंगी */
+            --bg: #f3f4f6;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { 
+            font-family: 'Mukta', 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            padding: 15px; 
+            color: #333;
+        }
+        .container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
         
-        /* Header */
-        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--light); padding-bottom: 15px; }
-        h1 { color: var(--primary); margin: 0; font-size: 24px; }
-        p.subtitle { color: #666; margin: 5px 0 0 0; font-size: 14px; }
+        /* हेडर (Header) */
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
+        h1 { color: var(--primary); margin: 0; font-size: 28px; font-weight: 800; }
+        p.subtitle { color: #666; margin: 5px 0 0 0; font-size: 16px; }
 
-        /* Form Elements */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; color: #333; margin-bottom: 8px; }
-        select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; background: white; }
+        /* फॉर्म (Input Area) */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; color: #444; margin-bottom: 8px; font-size: 18px; }
+        select { 
+            width: 100%; padding: 14px; border: 2px solid #ccc; border-radius: 10px; 
+            font-size: 18px; background: #fff; outline: none;
+        }
+        select:focus { border-color: var(--primary); }
         
         button { 
-            width: 100%; padding: 14px; background: var(--primary); color: white; 
-            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; 
-            transition: background 0.3s;
+            width: 100%; padding: 15px; background: var(--primary); color: white; 
+            border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s;
         }
-        button:hover { background: #1b5e20; }
+        button:active { transform: scale(0.98); }
 
-        /* Results Area */
-        #status-msg { text-align: center; margin: 15px 0; font-style: italic; color: #666; font-size: 14px; }
+        /* रिजल्ट कार्ड (Results) */
+        #status-msg { text-align: center; margin: 15px 0; color: #666; font-size: 16px; }
+        
         .price-card { 
-            background: white; border: 1px solid #eee; border-left: 5px solid var(--primary); 
-            padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            background: white; 
+            border: 1px solid #eee; 
+            border-left: 6px solid var(--accent); 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
         }
-        .crop-info h3 { margin: 0 0 5px 0; color: #333; }
-        .crop-info p { margin: 0; color: #666; font-size: 14px; }
+        .crop-info h3 { margin: 0 0 5px 0; color: #222; font-size: 20px; }
+        .crop-info p { margin: 0; color: #555; font-size: 16px; }
+        
         .price-tag { text-align: right; }
-        .price-val { font-size: 20px; font-weight: bold; color: var(--primary); display: block; }
-        .unit { font-size: 12px; color: #888; }
+        .price-val { font-size: 22px; font-weight: bold; color: var(--primary); display: block; }
+        .unit { font-size: 13px; color: #888; }
 
-        /* Badge for Demo Mode */
-        .demo-badge { background: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 4px; font-size: 12px; text-align: center; display: none; margin-bottom: 10px; }
+        /* डेमो अलर्ट (Warning Badge) */
+        .demo-badge { 
+            background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; 
+            font-size: 14px; text-align: center; display: none; margin-bottom: 15px; border: 1px solid #ffeeba;
+        }
+        
+        /* Loading Animation */
+        .loader { display: none; margin: 10px auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- CREDITS FOOTER (नया हिस्सा) --- */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .footer span {
+            color: var(--primary);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="demo-alert" class="demo-badge">⚠️ Server Busy: Showing Offline Demo Data</div>
+    <div id="demo-alert" class="demo-badge">⚠️ इंटरनेट धीमा है: पुराना डेटा दिखाया जा रहा है</div>
     
     <header>
-        <h1>🚜 Haryana Mandi Bhav</h1>
-        <p class="subtitle">Live Market Prices / ताजा मंडी भाव</p>
+        <h1>🚜 हरियाणा मंडी भाव</h1>
+        <p class="subtitle">किसानों के लिए भरोसेमंद साथी</p>
     </header>
 
     <div class="form-group">
-        <label>Select District / जिला चुनें:</label>
+        <label>अपना जिला चुनें:</label>
         <select id="district">
-            <option value="Karnal">Karnal (करनाल)</option>
-            <option value="Kurukshetra">Kurukshetra (कुरुक्षेत्र)</option>
-            <option value="Ambala">Ambala (अंबाला)</option>
-            <option value="Panipat">Panipat (पानीपत)</option>
-            <option value="Hisar">Hisar (हिसार)</option>
-            <option value="Sonipat">Sonipat (सोनीपत)</option>
-            <option value="Sirsa">Sirsa (सिरसा)</option>
-            <option value="Yamunanagar">Yamunanagar (यमुनानगर)</option>
-            <option value="Rohtak">Rohtak (रोहतक)</option>
-            <option value="Kaithal">Kaithal (कैथल)</option>
+            <option value="Karnal">करनाल</option>
+            <option value="Kurukshetra">कुरुक्षेत्र</option>
+            <option value="Ambala">अंबाला</option>
+            <option value="Panipat">पानीपत</option>
+            <option value="Hisar">हिसार</option>
+            <option value="Sonipat">सोनीपत</option>
+            <option value="Sirsa">सिरसा</option>
+            <option value="Yamunanagar">यमुनानगर</option>
+            <option value="Rohtak">रोहतक</option>
+            <option value="Kaithal">कैथल</option>
+            <option value="Jind">जींद</option>
+            <option value="Fatehabad">फतेहाबाद</option>
+            <option value="Gurugram">गुरुग्राम</option>
+            <option value="Faridabad">फरीदाबाद</option>
         </select>
     </div>
 
-    <button onclick="getPrices()">Check Price (भाव देखें)</button>
+    <button onclick="getPrices()">भाव देखें 🔍</button>
+    
+    <div class="loader" id="loader"></div>
     <div id="status-msg"></div>
     <div id="results"></div>
+
+    <div class="footer">
+        यह वेबसाइट <span>अमित कुमार</span> द्वारा बनाई गई है ❤️
+    </div>
 </div>
 
 <script>
-    // 1. Hindi Translation Dictionary
+    // 1. हिंदी अनुवाद डिक्शनरी
     const dictionary = {
         "Wheat": "गेहूं",
         "Rice": "चावल",
-        "Paddy(Dhan)": "धान (Basmati)",
+        "Paddy(Dhan)": "धान (बासमती)",
         "Potato": "आलू",
         "Onion": "प्याज",
         "Tomato": "टमाटर",
@@ -93,7 +152,13 @@
         "Maize": "मक्का",
         "Cauliflower": "फूलगोभी",
         "Bottle gourd": "लौकी",
-        "Carrot": "गाजर"
+        "Carrot": "गाजर",
+        "Peas Wet": "मटर (हरी)",
+        "Apple": "सेब",
+        "Banana": "केला",
+        "Kinnow": "किन्नू",
+        "Grapes": "अंगूर",
+        "Guava": "अमरूद"
     };
 
     function translate(text) {
@@ -101,7 +166,7 @@
         return dictionary[text] || text;
     }
 
-    // 2. MOCK DATA (Fallback if API key hits limit)
+    // 2. डेमो डेटा (बैकअप)
     const mockData = {
         "Karnal": [
             { commodity: "Wheat", market: "Karnal", modal_price: "2275", arrival_date: "12/12/2025" },
@@ -111,8 +176,8 @@
             { commodity: "Rice", market: "Thanesar", modal_price: "4100", arrival_date: "12/12/2025" },
             { commodity: "Potato", market: "Pipli", modal_price: "800", arrival_date: "12/12/2025" }
         ],
-        "Ambala": [
-             { commodity: "Onion", market: "Ambala City", modal_price: "3500", arrival_date: "12/12/2025" }
+        "Jind": [
+             { commodity: "Cotton", market: "Jind City", modal_price: "6900", arrival_date: "12/12/2025" }
         ]
     };
 
@@ -121,47 +186,44 @@
         const resultsDiv = document.getElementById('results');
         const statusMsg = document.getElementById('status-msg');
         const demoAlert = document.getElementById('demo-alert');
+        const loader = document.getElementById('loader');
 
-        // Reset UI
         resultsDiv.innerHTML = '';
         demoAlert.style.display = 'none';
-        statusMsg.innerText = 'Connecting to Government Server...';
-        
-        // --- YOUR API KEY INTEGRATED HERE ---
-        const apiKey = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
-        // -------------------------------
+        statusMsg.innerText = '';
+        loader.style.display = 'block';
 
+        // --- आपका API KEY ---
+        const apiKey = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
+        
         const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
 
         try {
-            // Attempt to fetch real data
             const response = await fetch(url);
             
-            if (!response.ok) {
-                 throw new Error("API Limit or Server Error: " + response.status); 
-            }
+            if (!response.ok) { throw new Error("API Error"); }
 
             const data = await response.json();
-            
-            // Check if records exist
+            loader.style.display = 'none';
+
             if (data.records && data.records.length > 0) {
-                statusMsg.innerText = `Found ${data.records.length} updates for ${district}`;
+                statusMsg.innerText = `✅ ${district} में ${data.records.length} मंडियों के भाव मिले:`;
+                statusMsg.style.color = "green";
                 renderData(data.records);
             } else {
-                // If API works but list is empty
-                throw new Error("No data found for this district today");
+                throw new Error("No data");
             }
 
         } catch (error) {
-            // FALLBACK TO MOCK DATA
+            loader.style.display = 'none';
             console.warn("API Issue:", error);
             demoAlert.style.display = 'block';
-            statusMsg.innerText = 'Showing offline estimates (Server Busy)';
+            statusMsg.innerText = '⚠️ सरकारी सर्वर व्यस्त है, अनुमानित भाव:';
+            statusMsg.style.color = "#856404";
             
-            // Get mock data or generate generic fallback
             const fakeData = mockData[district] || [
-                { commodity: "Wheat", market: district + " Mandi", modal_price: "2200", arrival_date: "12/12/2025" },
-                { commodity: "Rice", market: district + " Mandi", modal_price: "3500", arrival_date: "12/12/2025" }
+                { commodity: "Wheat", market: district + " मंडी", modal_price: "2200", arrival_date: "12/12/2025" },
+                { commodity: "Mustard", market: district + " मंडी", modal_price: "5450", arrival_date: "12/12/2025" }
             ];
             renderData(fakeData);
         }
@@ -177,13 +239,13 @@
             card.className = 'price-card';
             card.innerHTML = `
                 <div class="crop-info">
-                    <h3>${hindiName} <small style="color:#888; font-size:14px">(${item.commodity})</small></h3>
-                    <p>📍 ${item.market}</p>
-                    <p>📅 ${item.arrival_date}</p>
+                    <h3>${hindiName}</h3>
+                    <p>📍 मंडी: ${item.market}</p>
+                    <p>📅 तारीख: ${item.arrival_date}</p>
                 </div>
                 <div class="price-tag">
                     <span class="price-val">₹${item.modal_price}</span>
-                    <span class="unit">per Quintal</span>
+                    <span class="unit">प्रति क्विंटल</span>
                 </div>
             `;
             resultsDiv.appendChild(card);
