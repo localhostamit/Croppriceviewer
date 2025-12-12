@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Haryana Mandi Bhav Tracker</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #2c7a2c; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #2c7a2c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #236323; }
+        #results { margin-top: 20px; }
+        .price-card { background: #e8f5e9; border-left: 5px solid #2c7a2c; padding: 15px; margin-bottom: 10px; }
+        .loading { text-align: center; color: #666; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌾 Haryana Kisan Mandi</h1>
+    
+    <div class="input-group">
+        <label>Select District (Example)</label>
+        <select id="district">
+            <option value="Karnal">Karnal</option>
+            <option value="Ambala">Ambala</option>
+            <option value="Kurukshetra">Kurukshetra</option>
+            <option value="Panipat">Panipat</option>
+            <option value="Hisar">Hisar</option>
+        </select>
+    </div>
+
+    <button onclick="fetchPrices()">Check Prices</button>
+    <p class="loading" id="loader">Fetching latest government data...</p>
+    <div id="results"></div>
+</div>
+
+<script>
+    async function fetchPrices() {
+        const district = document.getElementById('district').value;
+        const resultsDiv = document.getElementById('results');
+        const loader = document.getElementById('loader');
+        
+        // CLEAR PREVIOUS RESULTS
+        resultsDiv.innerHTML = '';
+        loader.style.display = 'block';
+
+        // YOUR API KEY HERE (Register at data.gov.in to get one)
+        // For testing, this demo key might work but has low limits:
+        const apiKey = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b"; 
+        
+        // CONSTRUCT THE URL
+        // We filter by State=Haryana and District
+        const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            loader.style.display = 'none';
+            
+            if (data.records && data.records.length > 0) {
+                data.records.forEach(record => {
+                    const card = document.createElement('div');
+                    card.className = 'price-card';
+                    card.innerHTML = `
+                        <h3>${record.commodity}</h3>
+                        <p><strong>Market:</strong> ${record.market}</p>
+                        <p><strong>Price:</strong> ₹${record.modal_price} / Quintal</p>
+                        <p><small>Date: ${record.arrival_date}</small></p>
+                    `;
+                    resultsDiv.appendChild(card);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p style="text-align:center">No data found for this district today.</p>';
+            }
+        } catch (error) {
+            loader.style.display = 'none';
+            resultsDiv.innerHTML = '<p style="color:red; text-align:center">Error fetching data. API limit might be reached.</p>';
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
