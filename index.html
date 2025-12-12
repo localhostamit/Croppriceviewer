@@ -68,6 +68,7 @@
             <option value="Sirsa">Sirsa (सिरसा)</option>
             <option value="Yamunanagar">Yamunanagar (यमुनानगर)</option>
             <option value="Rohtak">Rohtak (रोहतक)</option>
+            <option value="Kaithal">Kaithal (कैथल)</option>
         </select>
     </div>
 
@@ -126,8 +127,8 @@
         demoAlert.style.display = 'none';
         statusMsg.innerText = 'Connecting to Government Server...';
         
-        // --- API KEY INTEGRATED HERE ---
-        const apiKey = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b";
+        // --- YOUR API KEY INTEGRATED HERE ---
+        const apiKey = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
         // -------------------------------
 
         const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
@@ -135,6 +136,11 @@
         try {
             // Attempt to fetch real data
             const response = await fetch(url);
+            
+            if (!response.ok) {
+                 throw new Error("API Limit or Server Error: " + response.status); 
+            }
+
             const data = await response.json();
             
             // Check if records exist
@@ -142,7 +148,7 @@
                 statusMsg.innerText = `Found ${data.records.length} updates for ${district}`;
                 renderData(data.records);
             } else {
-                // If API works but list is empty (common on weekends/holidays)
+                // If API works but list is empty
                 throw new Error("No data found for this district today");
             }
 
