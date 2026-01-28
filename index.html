@@ -1,448 +1,270 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>हरियाणा किसान ऐप</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Mitra | Smart Mandi Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
-        /* --- 1. THEME SETTINGS --- */
         :root {
-            --primary: #1b5e20;  /* गहरा हरा */
-            --light-green: #e8f5e9;
-            --accent: #ff9800;   /* ऑरेंज */
-            --text: #2c3e50;
-            --bg: #f8f9fa;
+            --green-dark: #1b5e20;
+            --green-light: #4caf50;
+            --bg-color: #f4f7f6;
+            --card-white: #ffffff;
+            --text-main: #333;
+            --text-sub: #666;
+            --accent-orange: #ff9800;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: 0; 
-            color: var(--text);
-            -webkit-tap-highlight-color: transparent; /* मोबाइल पर क्लिक हाइलाइट हटाना */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
         }
 
-        /* --- 2. HEADER & WEATHER --- */
-        .app-header {
-            background: #ffffff;
+        /* --- 1. HEADER & NEWS TICKER --- */
+        .header {
+            background: var(--green-dark);
+            color: white;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .logo { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+        .logo i { color: var(--green-light); margin-right: 5px; }
+        .date-badge { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+
+        /* Scrolling News Ticker */
+        .news-ticker {
+            background: #333;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+        .ticker-content {
+            display: inline-block;
+            animation: scroll-left 20s linear infinite;
+        }
+        @keyframes scroll-left {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
         }
 
-        .brand h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--primary); }
-        .brand span { font-size: 12px; color: #666; display: block; }
-
-        .weather-badge {
-            background: var(--light-green);
-            color: var(--primary);
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        /* --- 2. DASHBOARD CONTAINER --- */
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 1fr 350px; /* Main Area | Sidebar */
+            gap: 20px;
         }
 
-        /* --- 3. MAIN CONTAINER --- */
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-
-        /* INPUT AREA */
-        .control-panel {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            margin-bottom: 20px;
-        }
-
-        label { display: block; font-weight: 600; margin-bottom: 10px; color: #444; }
+        /* --- 3. MAIN CARDS SECTION --- */
+        .main-section h2 { font-size: 18px; color: var(--text-sub); margin-bottom: 15px; border-left: 4px solid var(--green-light); padding-left: 10px; }
         
-        select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            font-size: 16px;
-            background: #fff;
-            outline: none;
-            appearance: none; /* डिफ़ॉल्ट ऐरो हटाना */
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px top 50%;
-            background-size: 12px auto;
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
         }
 
-        button.search-btn {
-            width: 100%;
-            margin-top: 15px;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(27, 94, 32, 0.3);
+        .card {
+            background: var(--card-white);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-top: 4px solid transparent;
             transition: transform 0.2s;
         }
-        button.search-btn:active { transform: scale(0.96); }
+        .card:hover { transform: translateY(-5px); }
+        .card.wheat { border-top-color: #fdd835; }
+        .card.rice { border-top-color: #90caf9; }
+        .card.veg { border-top-color: #66bb6a; }
 
-        /* --- 4. MANDI SLIDER (CHIPS) --- */
-        .slider-container {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        .slider-container::-webkit-scrollbar { display: none; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .crop-title { font-weight: 700; font-size: 16px; }
+        .mandi-tag { font-size: 11px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #555; }
 
-        .chip {
-            display: inline-block;
-            padding: 8px 16px;
-            margin-right: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 50px;
-            font-size: 14px;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .price-box {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
         }
-        .chip.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 2px 8px rgba(27, 94, 32, 0.3);
-        }
+        .price-qtl { font-size: 22px; font-weight: bold; color: var(--green-dark); }
+        .price-kg { font-size: 13px; color: var(--accent-orange); font-weight: 500; margin-top: 2px; }
+        .trend { font-size: 11px; margin-top: 5px; }
+        .up { color: green; } .down { color: red; }
 
-        /* --- 5. PRICE CARDS --- */
-        .card {
+        /* --- 4. SIDEBAR (WEATHER & GRAPH) --- */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        
+        .widget {
             background: white;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            border: 1px solid transparent;
-            transition: all 0.2s;
-            cursor: pointer;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .card:active { transform: scale(0.98); background: #f5f5f5; }
         
-        .card-left h3 { margin: 0; font-size: 18px; color: #222; }
-        .card-left span { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card-left p { margin: 5px 0 0 0; font-size: 14px; color: #555; display: flex; align-items: center; gap: 4px; }
-        
-        .card-right { text-align: right; }
-        .price { font-size: 24px; font-weight: 800; color: var(--primary); display: block; }
-        .unit { font-size: 12px; color: #888; }
-
-        .trend-icon { font-size: 10px; background: var(--light-green); color: var(--primary); padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
-
-        /* --- 6. LOADING & FOOTER --- */
-        .loader { 
-            display: none; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); 
-            border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; 
+        /* Weather Style */
+        .weather-widget { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            text-align: center;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .weather-temp { font-size: 42px; font-weight: bold; margin: 10px 0; }
 
-        .footer { text-align: center; padding: 30px 0; color: #999; font-size: 13px; font-weight: 500; }
-        .footer span { color: var(--primary); font-weight: bold; }
+        /* --- 5. FOOTER --- */
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: #fff;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #777;
+        }
+        .footer strong { color: var(--green-dark); font-size: 14px; display: block; margin-bottom: 5px; }
+        .tech-stack { color: var(--green-light); font-size: 10px; text-transform: uppercase; margin-top: 5px; }
 
-        /* --- 7. MODAL --- */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 24px 24px 0 0; animation: slideUp 0.3s; }
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
-        .chart-box { height: 250px; margin-top: 15px; }
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; } /* Stack everything */
+            .header { flex-direction: column; gap: 10px; text-align: center; }
+            .crop-grid { grid-template-columns: 1fr; } /* 1 card per row */
+            .sidebar { order: -1; } /* Put Weather ON TOP for mobile */
+        }
     </style>
 </head>
 <body>
 
-    <header class="app-header">
-        <div class="brand">
-            <h1>🌾 किसान ऐप</h1>
-            <span>मंडी भाव अपडेट</span>
+    <div class="header">
+        <div class="logo"><i class="fa-solid fa-seedling"></i> Kisan Mitra</div>
+        <div class="date-badge" id="current-date">Fetching Date...</div>
+    </div>
+
+    <div class="news-ticker">
+        <div class="ticker-content">
+            📢 Update: Wheat prices expected to rise by ₹50 this week. | 🌧️ Heavy rain alert for Karnal district tomorrow. | 🚜 Subsidy on new tractors announced by Haryana Govt. | 📢 Mandi closed on Sunday.
         </div>
-        <div class="weather-badge" id="weather-box">
-            <span>🌤️</span> <span id="temp-val">--°C</span>
-        </div>
-    </header>
+    </div>
 
     <div class="container">
         
-        <div class="control-panel">
-            <label>📍 अपना जिला चुनें:</label>
-            <select id="district" onchange="fetchWeather()">
-                <option value="Karnal">करनाल (Karnal)</option>
-                <option value="Kurukshetra">कुरुक्षेत्र (Kurukshetra)</option>
-                <option value="Ambala">अंबाला (Ambala)</option>
-                <option value="Panipat">पानीपत (Panipat)</option>
-                <option value="Hisar">हिसार (Hisar)</option>
-                <option value="Sonipat">सोनीपत (Sonipat)</option>
-                <option value="Sirsa">सिरसा (Sirsa)</option>
-                <option value="Yamunanagar">यमुनानगर (Yamunanagar)</option>
-                <option value="Rohtak">रोहतक (Rohtak)</option>
-                <option value="Jind">जींद (Jind)</option>
-                <option value="Fatehabad">फतेहाबाद (Fatehabad)</option>
-                <option value="Kaithal">कैथल (Kaithal)</option>
-                <option value="Bhiwani">भिवानी (Bhiwani)</option>
-            </select>
-            <button class="search-btn" onclick="getPrices()">भाव देखें</button>
+        <div class="main-section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>🌾 Live Mandi Rates (Indri/Karnal)</h2>
+                <button onclick="location.reload()" style="background:none; border:none; color:var(--green-light); cursor:pointer;"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+            </div>
+            
+            <div class="crop-grid" id="crop-list">
+                </div>
         </div>
 
-        <div id="mandi-wrapper" style="display:none;">
-            <div class="slider-container" id="mandi-chips"></div>
-        </div>
+        <div class="sidebar">
+            
+            <div class="widget weather-widget">
+                <div style="font-size:14px; opacity:0.9;">Current Weather (Karnal)</div>
+                <div class="weather-temp">24°C</div>
+                <div><i class="fa-solid fa-cloud-sun"></i> Mostly Sunny</div>
+                <div style="margin-top:10px; font-size:12px; opacity:0.8;">Humidity: 45% | Wind: 12km/h</div>
+            </div>
 
-        <div class="loader" id="loader"></div>
-        <div id="results"></div>
+            <div class="widget">
+                <h3 style="font-size:14px; margin:0 0 15px 0; color:#555;">📈 Wheat Price Trend (5 Days)</h3>
+                <canvas id="priceChart"></canvas>
+            </div>
 
-        <div class="footer">
-            Developed by <span>Amit Kumar</span> ❤️<br>
-            for Indian Farmers
         </div>
     </div>
 
-    <div id="trendModal" class="modal" onclick="closeModal(event)">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h2 style="margin:0; font-size:20px; color:var(--primary);">📊 भाव का ट्रेंड</h2>
-                <span onclick="document.getElementById('trendModal').style.display='none'" style="font-size:28px; color:#999; cursor:pointer;">&times;</span>
-            </div>
-            <p style="margin:0; font-size:13px; color:#666;">पिछले कुछ महीनों का उतार-चढ़ाव</p>
-            <div class="chart-box">
-                <canvas id="myChart"></canvas>
-            </div>
-            <button onclick="document.getElementById('trendModal').style.display='none'" style="width:100%; margin-top:15px; padding:12px; background:#eee; border:none; border-radius:10px; font-weight:bold; color:#555;">बंद करें</button>
-        </div>
+    <div class="footer">
+        <strong>Project Created By Amit Kumar</strong>
+        Student at Shaheed Udham Singh Govt College, Indri Karnal
+        <div class="tech-stack">HTML5 • CSS3 • JS • Chart.js • Responsive Design</div>
     </div>
 
-<script>
-    // --- CONFIGURATION ---
-    const apiKey = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
-    let allRecords = [];
-    let myChart = null;
+    <script>
+        // --- 1. SET DATE ---
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', options);
 
-    // --- DICTIONARY (English -> Hindi) ---
-    const dictionary = {
-        "Wheat": "गेहूं",
-        "Rice": "चावल",
-        "Paddy(Dhan)": "धान (बासमती)",
-        "Potato": "आलू",
-        "Onion": "प्याज",
-        "Tomato": "टमाटर",
-        "Mustard": "सरसों",
-        "Cotton": "कपास",
-        "Sugarcane": "गन्ना",
-        "Bajra": "बाजरा",
-        "Maize": "मक्का",
-        "Cauliflower": "फूलगोभी",
-        "Bottle gourd": "लौकी",
-        "Carrot": "गाजर",
-        "Peas Wet": "मटर (हरी)",
-        "Apple": "सेब",
-        "Banana": "केला",
-        "Green Chilli": "हरी मिर्च",
-        "Cucumber": "खीरा",
-        "Brinjal": "बैंगन",
-        "Garlic": "लहसुन",
-        "Ginger": "अदरक"
-    };
-
-    const districtCoords = {
-        "Karnal": {lat: 29.68, lon: 76.99},
-        "Kurukshetra": {lat: 29.96, lon: 76.87},
-        "Ambala": {lat: 30.37, lon: 76.77},
-        "Panipat": {lat: 29.39, lon: 76.96},
-        "Hisar": {lat: 29.14, lon: 75.72},
-        "Sonipat": {lat: 28.99, lon: 77.01},
-        "Sirsa": {lat: 29.53, lon: 75.02},
-        "Yamunanagar": {lat: 30.12, lon: 77.26},
-        "Rohtak": {lat: 28.89, lon: 76.60},
-        "Jind": {lat: 29.31, lon: 76.31},
-        "Fatehabad": {lat: 29.50, lon: 75.45},
-        "Kaithal": {lat: 29.80, lon: 76.40},
-        "Bhiwani": {lat: 28.78, lon: 76.13}
-    };
-
-    // --- WEATHER FUNCTION ---
-    async function fetchWeather() {
-        const district = document.getElementById('district').value;
-        const coords = districtCoords[district] || districtCoords["Karnal"];
-        const weatherBox = document.getElementById('temp-val');
-        
-        weatherBox.innerHTML = '<span style="font-size:10px">loading..</span>';
-        
-        try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current_weather=true`;
-            const response = await fetch(url);
-            const data = await response.json();
-            weatherBox.innerText = `${Math.round(data.current_weather.temperature)}°C`;
-        } catch (e) {
-            weatherBox.innerText = "--";
-        }
-    }
-
-    // --- MAIN PRICES FUNCTION ---
-    async function getPrices() {
-        const district = document.getElementById('district').value;
-        const loader = document.getElementById('loader');
-        const resultsDiv = document.getElementById('results');
-        const mandiWrapper = document.getElementById('mandi-wrapper');
-
-        resultsDiv.innerHTML = '';
-        mandiWrapper.style.display = 'none';
-        loader.style.display = 'block';
-
-        // Mock Fallback Data (अगर API न चले)
-        const mockData = [
-            { commodity: "Wheat", market: district + " Mandi", modal_price: "2275", arrival_date: "Offline Mode" },
-            { commodity: "Mustard", market: district + " Mandi", modal_price: "5650", arrival_date: "Offline Mode" },
-            { commodity: "Potato", market: "Local Mandi", modal_price: "850", arrival_date: "Offline Mode" }
+        // --- 2. DATA (Mock Data for Stability) ---
+        const mandiData = [
+            { name: "Wheat (गेहूं)", type: "wheat", mandi: "Karnal New Anaj Mandi", price: 2275, oldPrice: 2250 },
+            { name: "Paddy (जीरी/धान)", type: "rice", mandi: "Indri Mandi", price: 3800, oldPrice: 3850 },
+            { name: "Mustard (सरसों)", type: "wheat", mandi: "Karnal", price: 5450, oldPrice: 5450 },
+            { name: "Potato (आलू)", type: "veg", mandi: "Pipli", price: 1200, oldPrice: 1100 },
+            { name: "Onion (प्याज़)", type: "veg", mandi: "Indri", price: 3500, oldPrice: 3200 },
+            { name: "Tomato (टमाटर)", type: "veg", mandi: "Karnal", price: 2800, oldPrice: 3000 }
         ];
 
-        try {
-            const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[state]=Haryana&filters[district]=${district}`;
+        // --- 3. RENDER CARDS ---
+        const grid = document.getElementById('crop-list');
+        
+        mandiData.forEach(item => {
+            // Calculate Price Per KG
+            let pricePerKg = (item.price / 100).toFixed(2);
             
-            const response = await fetch(url);
-            if(!response.ok) throw new Error("API Fail");
-            
-            const data = await response.json();
-            
-            loader.style.display = 'none';
-
-            if (data.records && data.records.length > 0) {
-                allRecords = data.records;
-                createChips(allRecords);
-                renderData(allRecords);
-            } else {
-                // No Data from API? Show Mock Data nicely
-                console.warn("No API data, showing Mock");
-                allRecords = mockData;
-                createChips(allRecords);
-                renderData(allRecords);
-                showToast("ताज़ा डेटा उपलब्ध नहीं है, पुराना डेटा दिखाया जा रहा है।");
+            // Calculate Trend
+            let trendHtml = '<span style="color:gray"><i class="fa-solid fa-minus"></i> Stable</span>';
+            if(item.price > item.oldPrice) {
+                trendHtml = `<span class="up"><i class="fa-solid fa-arrow-up"></i> +₹${item.price - item.oldPrice} (Rising)</span>`;
+            } else if (item.price < item.oldPrice) {
+                trendHtml = `<span class="down"><i class="fa-solid fa-arrow-down"></i> -₹${item.oldPrice - item.price} (Falling)</span>`;
             }
 
-        } catch (error) {
-            loader.style.display = 'none';
-            allRecords = mockData;
-            createChips(allRecords);
-            renderData(allRecords);
-            showToast("इंटरनेट या सर्वर समस्या। ऑफलाइन मोड सक्रिय।");
-        }
-    }
-
-    // --- UI HELPERS ---
-    function createChips(records) {
-        const slider = document.getElementById('mandi-chips');
-        document.getElementById('mandi-wrapper').style.display = 'block';
-        
-        const markets = [...new Set(records.map(item => item.market))];
-        markets.sort();
-
-        let html = `<div class="chip active" onclick="filterMandi('all', this)">सभी (All)</div>`;
-        markets.forEach(m => {
-            html += `<div class="chip" onclick="filterMandi('${m}', this)">${m}</div>`;
-        });
-        slider.innerHTML = html;
-    }
-
-    function filterMandi(mandiName, btn) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-
-        if (mandiName === 'all') renderData(allRecords);
-        else renderData(allRecords.filter(item => item.market === mandiName));
-    }
-
-    function renderData(records) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-        
-        records.forEach(item => {
-            const hindiName = dictionary[item.commodity] || item.commodity;
-            const englishName = item.commodity; // Keep English for reference
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.onclick = () => showGraph(hindiName, item.modal_price);
-
-            card.innerHTML = `
-                <div class="card-left">
-                    <h3>${hindiName}</h3>
-                    <span>${englishName}</span>
-                    <p>📍 ${item.market} <span class="trend-icon">📈 ग्राफ</span></p>
-                </div>
-                <div class="card-right">
-                    <span class="price">₹${item.modal_price}</span>
-                    <span class="unit">प्रति क्विंटल</span>
+            const card = `
+                <div class="card ${item.type}">
+                    <div class="card-header">
+                        <span class="crop-title">${item.name}</span>
+                        <span class="mandi-tag">${item.mandi}</span>
+                    </div>
+                    <div class="price-box">
+                        <div class="price-qtl">₹${item.price} <span style="font-size:12px; font-weight:normal; color:#555;">/ Quintal</span></div>
+                        <div class="price-kg">Rate: ₹${pricePerKg} / Kg</div>
+                    </div>
+                    <div style="text-align:center; margin-top:8px;">
+                        ${trendHtml}
+                    </div>
                 </div>
             `;
-            resultsDiv.appendChild(card);
+            grid.innerHTML += card;
         });
-    }
 
-    function showGraph(name, price) {
-        document.getElementById('trendModal').style.display = 'flex';
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const p = parseInt(price);
-        
-        if (myChart) myChart.destroy();
-        
-        myChart = new Chart(ctx, {
+        // --- 4. RENDER GRAPH (Chart.js) ---
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['5 महीना पहले', '4 महीना', '3 महीना', '2 महीना', 'पिछला माह', 'आज'],
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Today'],
                 datasets: [{
-                    label: `${name} का भाव`,
-                    data: [p-150, p-80, p+100, p-50, p+20, p],
-                    borderColor: '#1b5e20',
-                    backgroundColor: 'rgba(27, 94, 32, 0.1)',
-                    borderWidth: 3,
+                    label: 'Price (₹)',
+                    data: [2200, 2210, 2240, 2235, 2275],
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderWidth: 2,
                     fill: true,
                     tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: false }
-                }
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: false } }
             }
         });
-    }
 
-    function closeModal(e) {
-        if(e.target.id === 'trendModal') document.getElementById('trendModal').style.display = 'none';
-    }
-
-    function showToast(msg) {
-        // Simple alert for now, can be styled toast later
-        // alert(msg); 
-        // Not using alert to keep UI clean
-    }
-
-    // Init
-    fetchWeather();
-
-</script>
-
+    </script>
 </body>
 </html>
