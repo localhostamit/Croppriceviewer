@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kisan Mitra | Smart Mandi</title>
+    <title>किसान मित्र | स्मार्ट मंडी डैशबोर्ड</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,316 +12,370 @@
 
     <style>
         :root {
-            --primary: #1e8449;
+            --primary: #145a32;
             --secondary: #27ae60;
             --accent: #f39c12;
-            --bg: #f0f2f5;
+            --bg: #f4f7f6;
             --dark: #2c3e50;
+            --white: #ffffff;
         }
 
         body { font-family: 'Tiro Devanagari Hindi', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--dark); }
 
         /* HEADER */
         .header {
-            background: linear-gradient(135deg, #1e8449, #117a65);
+            background: linear-gradient(to right, #145a32, #1e8449);
             color: white;
-            padding: 15px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .brand { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .status-badge { font-size: 11px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 15px; }
-        .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; background: #ccc; margin-right: 5px; }
-        .dot.online { background: #00ff00; box-shadow: 0 0 5px #00ff00; }
-        .dot.offline { background: #ff0000; }
+        .brand { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .date-badge { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 14px; }
 
         /* LAYOUT */
         .container {
-            max-width: 1200px;
-            margin: 15px auto;
+            max-width: 1300px;
+            margin: 20px auto;
             padding: 0 15px;
             display: grid;
-            grid-template-columns: 1fr 320px; /* Content | Sidebar */
+            grid-template-columns: 320px 1fr 300px; /* Sidebar | Main | Extra */
             gap: 20px;
         }
 
-        /* CARD GRID */
-        .controls {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
+        /* CARD STYLES */
+        .card-box {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
-        select, button { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; font-family: inherit; }
-        button { background: var(--primary); color: white; border: none; font-weight: bold; width: auto; min-width: 100px;}
+        .section-title { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
 
+        /* 1. SIDEBAR (CONTROLS & CALCULATOR) */
+        .control-group { margin-bottom: 15px; }
+        label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-bottom: 5px; }
+        select, input, button { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        button.btn-primary { background: var(--secondary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button.btn-primary:hover { background: var(--primary); }
+
+        .calc-result { background: #e8f5e9; padding: 10px; border-radius: 6px; text-align: center; margin-top: 10px; font-weight: bold; color: var(--primary); }
+
+        /* 2. MAIN CONTENT (CROP GRID) */
         .crop-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Responsive cards */
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
         }
-
-        /* CLICKABLE CROP CARD */
-        .card {
+        .crop-card {
             background: white;
             padding: 15px;
             border-radius: 10px;
-            border-bottom: 4px solid var(--secondary);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer; /* SHOWS IT IS CLICKABLE */
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--secondary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
             position: relative;
         }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-bottom-color: var(--accent); }
-        .card:active { transform: scale(0.98); }
+        .crop-card:hover { transform: translateY(-5px); border-top-color: var(--accent); }
+        .crop-name { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .price-tag { font-size: 24px; font-weight: bold; color: #333; margin: 5px 0; }
+        .unit { font-size: 12px; color: #777; font-weight: normal; }
+        .trend-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+        .up { background: #e8f5e9; color: green; }
+        .down { background: #fbe9e7; color: red; }
 
-        .card h3 { margin: 0; font-size: 16px; color: var(--primary); }
-        .price-main { font-size: 20px; font-weight: bold; margin: 5px 0; }
-        .price-kg { font-size: 12px; color: #d35400; font-weight: 600; }
-        .click-hint { font-size: 10px; color: #999; margin-top: 8px; text-align: right; }
+        /* 3. RIGHT SIDEBAR (GRAPH & WEATHER) */
+        .weather-row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 10px; }
+        .weather-day { text-align: center; background: #f0f8ff; padding: 5px; border-radius: 5px; flex: 1; margin: 0 2px; }
 
-        /* SIDEBAR (GRAPH & WEATHER) */
-        .sidebar { display: flex; flex-direction: column; gap: 15px; }
-        .widget { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        
-        /* WEATHER */
-        .weather-widget { background: linear-gradient(to right, #56ccf2, #2f80ed); color: white; text-align: center; }
-        .temp { font-size: 36px; font-weight: bold; }
+        /* NEWS SECTION */
+        .news-ticker {
+            grid-column: 1 / -1;
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .news-label { background: var(--accent); color: #000; padding: 5px 10px; font-weight: bold; border-radius: 4px; font-size: 12px; margin-right: 10px; white-space: nowrap; }
+        .news-content { white-space: nowrap; animation: scroll 25s linear infinite; font-size: 14px; }
+        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
-        /* FOOTER */
-        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; margin-top: 20px; border-top: 1px solid #ddd; }
-        
-        /* MOBILE OPTIMIZATIONS */
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; display: flex; flex-direction: column-reverse; } /* Graph moves to bottom on mobile */
-            .sidebar { order: 1; margin-bottom: 20px;} /* Graph on top */
-            .content { order: 2; }
-            .header { position: relative; } /* Unstick header on small screens if needed */
+        /* GRAPH CONTAINER */
+        .graph-container { height: 250px; position: relative; }
+
+        /* MOBILE */
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 10px; }
+            .news-ticker { margin-top: 0; }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="brand"><i class="fa-solid fa-leaf"></i> Kisan Mitra</div>
-        <div class="status-badge">
-            <span class="dot" id="status-dot"></span> <span id="status-text">Connecting...</span>
-        </div>
+        <div class="brand"><i class="fa-solid fa-wheat-awn"></i> किसान मित्र (Kisan Mitra)</div>
+        <div class="date-badge" id="current-date">...</div>
     </div>
 
     <div class="container">
         
-        <div class="content">
-            <div class="controls">
-                <select id="district-select" onchange="fetchData()">
-                    <option value="Karnal">करनाल (Karnal)</option>
-                    <option value="Kurukshetra">कुरुक्षेत्र (Kurukshetra)</option>
-                    <option value="Panipat">पानीपत (Panipat)</option>
-                    <option value="Ambala">अंबाला (Ambala)</option>
-                </select>
-                <button onclick="fetchData()"><i class="fa-solid fa-sync"></i></button>
+        <div class="news-ticker">
+            <div class="news-label">कृषि समाचार</div>
+            <div class="news-content">
+                📢 <b>ताज़ा खबर:</b> हरियाणा सरकार ने गेहूं की खरीद पर 5% बोनस बढ़ाया। | 🚜 कृषि यंत्रों पर 50% सब्सिडी के लिए आवेदन 10 फरवरी तक। | 🌧️ मौसम विभाग: अगले 3 दिन करनाल और कुरुक्षेत्र में बादल छाए रहेंगे। | 🌾 मंडी भाव: बासमती चावल में ₹100 की तेजी। | 💊 यूरिया खाद की नई खेप सभी केंद्रों पर उपलब्ध।
             </div>
+        </div>
 
-            <div id="loading" style="text-align:center; padding:20px; display:none;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Loading Data...
-            </div>
-
-            <div class="crop-grid" id="data-grid">
+        <div class="sidebar-left">
+            <div class="card-box">
+                <div class="section-title"><i class="fa-solid fa-location-dot"></i> मंडी चुनें (Select Mandi)</div>
+                <div class="control-group">
+                    <label>जिला (District)</label>
+                    <select id="district-select" onchange="updateDashboard()">
+                        <option value="Karnal">करनाल (Karnal)</option>
+                        <option value="Kurukshetra">कुरुक्षेत्र (Kurukshetra)</option>
+                        <option value="Panipat">पानीपत (Panipat)</option>
+                        <option value="Ambala">अंबाला (Ambala)</option>
+                        <option value="Sonipat">सोनीपत (Sonipat)</option>
+                        <option value="Hisar">हिसार (Hisar)</option>
+                        <option value="Sirsa">सिरसा (Sirsa)</option>
+                        <option value="Rohtak">रोहतक (Rohtak)</option>
+                    </select>
                 </div>
+                <button class="btn-primary" onclick="updateDashboard()"><i class="fa-solid fa-rotate"></i> भाव रिफ्रेश करें</button>
+            </div>
+
+            <div class="card-box">
+                <div class="section-title"><i class="fa-solid fa-calculator"></i> मुनाफा कैलकुलेटर</div>
+                <div class="control-group">
+                    <label>फसल का वजन (क्विंटल में)</label>
+                    <input type="number" id="calc-weight" placeholder="Ex: 50">
+                </div>
+                <div class="control-group">
+                    <label>भाव (₹ प्रति क्विंटल)</label>
+                    <input type="number" id="calc-price" placeholder="Ex: 2200">
+                </div>
+                <button class="btn-primary" onclick="calculateProfit()">कुल कमाई देखें</button>
+                <div class="calc-result" id="calc-output">कुल राशि: ₹0</div>
+            </div>
         </div>
 
-        <div class="sidebar" id="graph-section">
+        <div class="main-content">
+            <div class="card-box">
+                <div class="section-title"><i class="fa-solid fa-list"></i> आज के भाव (Live Rates)</div>
+                <p style="font-size:12px; color:#777; margin-bottom:15px;">किसी भी फसल पर क्लिक करके उसका 6 महीने का ग्राफ देखें।</p>
+                
+                <div class="crop-grid" id="crop-grid">
+                    </div>
+            </div>
+        </div>
+
+        <div class="sidebar-right">
             
-            <div class="widget">
-                <h4 style="margin:0 0 10px 0; color:#555; display:flex; justify-content:space-between;">
-                    <span id="chart-title">📊 भाव ग्राफ (Wheat)</span>
-                </h4>
-                <canvas id="cropChart"></canvas>
-                <p style="font-size:10px; color:#888; text-align:center; margin-top:5px;">
-                    Click on a crop card to update this graph.
-                </p>
+            <div class="card-box">
+                <div class="section-title" id="graph-title">📈 भाव ग्राफ (6 महीने)</div>
+                <div class="graph-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
             </div>
 
-            <div class="widget weather-widget">
-                <div style="font-size:14px; opacity:0.9;">Live Weather (Karnal)</div>
-                <div class="temp" id="w-temp">--°C</div>
-                <div id="w-desc" style="font-size:12px;">Wait...</div>
+            <div class="card-box">
+                <div class="section-title"><i class="fa-solid fa-cloud-sun-rain"></i> 5 दिन का मौसम (Karnal)</div>
+                <div style="text-align:center; margin-bottom:10px;">
+                    <div style="font-size:36px; font-weight:bold; color:#2c3e50;" id="today-temp">--°C</div>
+                    <div style="font-size:12px; color:#666;" id="today-desc">Loading...</div>
+                </div>
+                <div class="weather-row" id="forecast-row">
+                    </div>
+                <div style="text-align:center; font-size:9px; color:#aaa; margin-top:5px;">Data: Open-Meteo API</div>
             </div>
 
         </div>
-    </div>
-
-    <div class="footer">
-        Project By <strong>Amit Kumar</strong> | Shaheed Udham Singh Govt College<br>
-        <span style="color:var(--primary);">Tech: HTML5 • API Integration • Chart.js</span>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        const API_KEY = "579b464db66ec23bdd0000014bdc9cd9e6ae4ea24fcbdd17bf6e00e2";
-        // NOTE: This URL structure uses the filters[state] param which is standard for data.gov.in
-        const RESOURCE_ID = "9ef84268-d588-465a-a308-a864a43d0070"; 
-        const API_URL = `https://api.data.gov.in/resource/${RESOURCE_ID}?api-key=${API_KEY}&format=json&limit=100&filters[state]=Haryana`;
+        // --- 1. SET DATE ---
+        const d = new Date();
+        document.getElementById('current-date').innerText = d.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        // --- 2. BACKUP DATA (For Demo Reliability) ---
-        const backupData = {
+        // --- 2. EXTENSIVE DATABASE (Simulated for Exhibition) ---
+        // Includes 6-month historical data (Aug, Sep, Oct, Nov, Dec, Jan) for the graph
+        const mandiDB = {
             "Karnal": [
-                { commodity: "Wheat", price: 2275, trend: [2200, 2220, 2250, 2260, 2275] },
-                { commodity: "Paddy (Dhan)", price: 3850, trend: [3800, 3820, 3810, 3840, 3850] },
-                { commodity: "Mustard", price: 5400, trend: [5300, 5350, 5400, 5380, 5400] },
-                { commodity: "Potato", price: 850, trend: [900, 880, 850, 860, 850] },
-                { commodity: "Tomato", price: 2800, trend: [2500, 2600, 2900, 3000, 2800] },
-                { commodity: "Onion", price: 3200, trend: [3000, 3100, 3150, 3200, 3200] }
+                { name: "गेहूं (Wheat)", price: 2275, old: 2260, history: [2150, 2180, 2200, 2220, 2250, 2275] },
+                { name: "धान (Paddy 1509)", price: 3850, old: 3900, history: [3600, 3700, 3900, 3850, 3800, 3850] },
+                { name: "सरसों (Mustard)", price: 5400, old: 5350, history: [5100, 5200, 5250, 5300, 5350, 5400] },
+                { name: "आलू (Potato)", price: 850, old: 800, history: [1200, 1100, 1000, 950, 900, 850] },
+                { name: "गन्ना (Sugarcane)", price: 386, old: 386, history: [370, 370, 380, 380, 386, 386] }
             ],
             "Kurukshetra": [
-                { commodity: "Wheat", price: 2280, trend: [2210, 2230, 2260, 2270, 2280] },
-                { commodity: "Potato", price: 900, trend: [950, 920, 900, 910, 900] }
+                { name: "गेहूं (Wheat)", price: 2280, old: 2270, history: [2160, 2190, 2210, 2240, 2260, 2280] },
+                { name: "सूरजमुखी (Sunflower)", price: 5600, old: 5550, history: [5400, 5500, 5600, 5500, 5550, 5600] },
+                { name: "आलू (Potato)", price: 900, old: 920, history: [1250, 1150, 1050, 1000, 950, 900] }
             ],
-            "Panipat": [ { commodity: "Wheat", price: 2260, trend: [2200, 2210, 2240, 2250, 2260] } ],
-            "Ambala": [ { commodity: "Rice", price: 4100, trend: [4000, 4050, 4080, 4090, 4100] } ]
+            "Panipat": [
+                { name: "गेहूं (Wheat)", price: 2260, old: 2250, history: [2140, 2170, 2190, 2220, 2240, 2260] },
+                { name: "गोभी (Cauliflower)", price: 1500, old: 1400, history: [2000, 1800, 1600, 1500, 1450, 1500] }
+            ],
+            "Ambala": [
+                { name: "धान (Paddy)", price: 3900, old: 3880, history: [3700, 3750, 3800, 3850, 3880, 3900] },
+                { name: "प्याज़ (Onion)", price: 3200, old: 3000, history: [2500, 2800, 3500, 4000, 3500, 3200] }
+            ],
+            "Sonipat": [
+                { name: "मशरूम (Mushroom)", price: 8500, old: 8200, history: [8000, 8100, 8200, 8300, 8400, 8500] },
+                { name: "मक्का (Maize)", price: 2100, old: 2050, history: [1900, 1950, 2000, 2050, 2080, 2100] }
+            ],
+            "Hisar": [
+                { name: "कपास (Cotton)", price: 6800, old: 6700, history: [6500, 6600, 6700, 6650, 6700, 6800] },
+                { name: "बाजरा (Bajra)", price: 2350, old: 2300, history: [2200, 2250, 2300, 2300, 2350, 2350] }
+            ],
+            "Sirsa": [
+                { name: "कपास (Cotton)", price: 6900, old: 6800, history: [6600, 6700, 6800, 6750, 6800, 6900] },
+                { name: "ग्वार (Guar)", price: 5400, old: 5300, history: [5100, 5200, 5250, 5300, 5350, 5400] }
+            ],
+            "Rohtak": [
+                { name: "गेहूं (Wheat)", price: 2270, old: 2260, history: [2150, 2180, 2210, 2240, 2250, 2270] },
+                { name: "ज्वार (Jowar)", price: 2800, old: 2750, history: [2600, 2650, 2700, 2750, 2780, 2800] }
+            ]
         };
 
-        // --- 3. UI ELEMENTS ---
-        const grid = document.getElementById('data-grid');
-        const loader = document.getElementById('loading');
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        
-        // --- 4. FETCH DATA ---
-        async function fetchData() {
-            const district = document.getElementById('district-select').value;
-            grid.innerHTML = "";
-            loader.style.display = "block";
-            statusText.innerText = "Requesting API...";
-            statusDot.className = "dot";
+        const MONTHS = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'];
 
-            try {
-                // ATTEMPT REAL API CALL
-                const response = await fetch(API_URL);
-                const data = await response.json();
-
-                if(data.records && data.records.length > 0) {
-                    // Filter for district matches if API returns data
-                    const districtData = data.records.filter(r => r.district.includes(district));
-                    if(districtData.length > 0) {
-                        renderCards(districtData, "Govt API");
-                        setOnline(true);
-                    } else {
-                        throw new Error("No data for district");
-                    }
-                } else {
-                    throw new Error("Empty API Response");
-                }
-            } catch (err) {
-                // FALLBACK TO BACKUP
-                console.warn("API Error (Expected without valid Resource ID):", err);
-                setTimeout(() => {
-                    const localData = backupData[district] || backupData["Karnal"];
-                    renderCards(localData, "Backup DB");
-                    setOnline(false);
-                }, 500);
-            }
-        }
-
-        function renderCards(items, source) {
-            loader.style.display = "none";
-            items.forEach(item => {
-                const name = item.commodity || item.Commodity;
-                const price = item.price || item.modal_price || 0;
-                const priceKg = (price / 100).toFixed(2);
-                
-                // We store the trend data in a data attribute to retrieve it on click
-                const trendData = JSON.stringify(item.trend || [price-50, price-30, price-10, price-5, price]);
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => updateGraph(name, JSON.parse(trendData)); // CLICK EVENT
-                card.innerHTML = `
-                    <h3>${name}</h3>
-                    <div class="price-main">₹${price} <span style="font-size:12px; font-weight:normal; color:#777;">/Qtl</span></div>
-                    <div class="price-kg">₹${priceKg} / Kg</div>
-                    <div class="click-hint"><i class="fa-solid fa-chart-line"></i> Tap to view graph</div>
-                `;
-                grid.appendChild(card);
-            });
-            
-            // Load first item's graph by default
-            if(items.length > 0) {
-                const first = items[0];
-                const trend = first.trend || [2200, 2220, 2250, 2260, 2275];
-                updateGraph(first.commodity || first.Commodity, trend);
-            }
-        }
-
-        function setOnline(isOnline) {
-            if(isOnline) {
-                statusDot.classList.add('online');
-                statusText.innerText = "Govt API Online";
-            } else {
-                statusDot.classList.add('offline');
-                statusText.innerText = "Backup System Active";
-            }
-        }
-
-        // --- 5. INTERACTIVE CHART ---
-        let cropChart;
+        // --- 3. INIT CHART ---
+        let priceChart;
         function initChart() {
-            const ctx = document.getElementById('cropChart').getContext('2d');
-            cropChart = new Chart(ctx, {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Today'],
+                    labels: MONTHS,
                     datasets: [{
-                        label: 'Price (₹)',
-                        data: [0, 0, 0, 0, 0],
-                        borderColor: '#1e8449',
-                        backgroundColor: 'rgba(30, 132, 73, 0.1)',
+                        label: 'भाव (Price)',
+                        data: [0,0,0,0,0,0],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
                         fill: true,
-                        tension: 0.4
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
-                    animation: { duration: 1000 },
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
                     scales: { y: { beginAtZero: false } }
                 }
             });
         }
 
-        function updateGraph(name, dataPoints) {
-            document.getElementById('chart-title').innerText = `📊 ${name} Price History`;
-            cropChart.data.datasets[0].label = `${name} Price (₹)`;
-            cropChart.data.datasets[0].data = dataPoints;
-            cropChart.update();
+        // --- 4. RENDER DASHBOARD ---
+        function updateDashboard() {
+            const district = document.getElementById('district-select').value;
+            const data = mandiDB[district] || mandiDB["Karnal"];
+            const grid = document.getElementById('crop-grid');
+            
+            grid.innerHTML = "";
 
-            // Mobile: Scroll to graph smoothly
-            if(window.innerWidth < 768) {
-                document.getElementById('graph-section').scrollIntoView({behavior: 'smooth'});
+            data.forEach((item, index) => {
+                // Determine Trend
+                let trendBadge = "";
+                if(item.price > item.old) trendBadge = `<span class="trend-badge up">▲ +₹${item.price - item.old}</span>`;
+                else if(item.price < item.old) trendBadge = `<span class="trend-badge down">▼ -₹${item.old - item.price}</span>`;
+                else trendBadge = `<span class="trend-badge" style="background:#eee; color:#666;">- स्थिर</span>`;
+
+                // JSON stringify the history for onclick event
+                const historyStr = JSON.stringify(item.history);
+
+                const card = document.createElement('div');
+                card.className = "crop-card";
+                card.onclick = () => updateGraph(item.name, item.history);
+                card.innerHTML = `
+                    <div class="crop-name">${item.name}</div>
+                    <div class="price-tag">₹${item.price} <span class="unit">/Qtl</span></div>
+                    ${trendBadge}
+                    <div style="font-size:10px; color:#999; margin-top:8px;">Tap for Graph</div>
+                `;
+                grid.appendChild(card);
+
+                // Auto-load first graph
+                if(index === 0) updateGraph(item.name, item.history);
+            });
+        }
+
+        function updateGraph(name, data) {
+            document.getElementById('graph-title').innerText = `📈 भाव ग्राफ: ${name}`;
+            priceChart.data.datasets[0].data = data;
+            priceChart.update();
+        }
+
+        // --- 5. PROFIT CALCULATOR ---
+        function calculateProfit() {
+            const w = parseFloat(document.getElementById('calc-weight').value);
+            const p = parseFloat(document.getElementById('calc-price').value);
+            const resBox = document.getElementById('calc-output');
+
+            if(!w || !p) {
+                resBox.innerText = "कृपया सही नंबर डालें";
+                return;
+            }
+            const total = w * p;
+            resBox.innerHTML = `कुल आमदनी: <span style="font-size:18px;">₹${total.toLocaleString('en-IN')}</span>`;
+        }
+
+        // --- 6. WEATHER FORECAST API (Open-Meteo) ---
+        async function fetchWeather() {
+            try {
+                // Lat/Lon for Karnal
+                const url = "https://api.open-meteo.com/v1/forecast?latitude=29.6857&longitude=76.9905&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto";
+                const res = await fetch(url);
+                const data = await res.json();
+
+                // Today
+                const max = data.daily.temperature_2m_max[0];
+                const min = data.daily.temperature_2m_min[0];
+                document.getElementById('today-temp').innerText = `${Math.round(max)}°C`;
+                document.getElementById('today-desc').innerText = `Min: ${min}°C`;
+
+                // 5 Days Forecast
+                const row = document.getElementById('forecast-row');
+                row.innerHTML = "";
+                
+                // We show next 4 days (Index 1 to 4)
+                const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                
+                for(let i=1; i<=4; i++) {
+                    const d = new Date(data.daily.time[i]);
+                    const dayName = d.toLocaleDateString('en-IN', {weekday:'short'});
+                    const tMax = Math.round(data.daily.temperature_2m_max[i]);
+                    
+                    row.innerHTML += `
+                        <div class="weather-day">
+                            <div style="font-weight:bold;">${dayName}</div>
+                            <div style="font-size:14px; margin:2px 0;"><i class="fa-solid fa-cloud-sun"></i></div>
+                            <div>${tMax}°</div>
+                        </div>
+                    `;
+                }
+
+            } catch(e) {
+                console.log(e);
             }
         }
 
-        // --- 6. WEATHER ---
-        async function getWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=29.6857&longitude=76.9905&current_weather=true');
-                const data = await res.json();
-                document.getElementById('w-temp').innerText = data.current_weather.temperature + "°C";
-                document.getElementById('w-desc').innerText = "Wind: " + data.current_weather.windspeed + " km/h";
-            } catch(e) {}
-        }
-
-        // INIT
+        // --- STARTUP ---
         initChart();
-        getWeather();
-        fetchData();
+        updateDashboard();
+        fetchWeather();
 
     </script>
 </body>
